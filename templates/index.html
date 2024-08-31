@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Database UI</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> <!-- Include jQuery -->
+    <script>
+        // Function to update databases list
+        function updateDatabasesList() {
+            $.ajax({
+                url: '/get_databases',  // Flask route to get list of databases
+                type: 'GET',
+                success: function(data) {
+                    // Update the databases list
+                    var databasesList = document.getElementById('databases-list');
+                    databasesList.innerHTML = '';  // Clear current list
+                    data.forEach(function(db) {
+                        var li = document.createElement('li');
+                        li.textContent = db;
+                        databasesList.appendChild(li);
+                    });
+                },
+                error: function(error) {
+                    console.error('Error fetching databases:', error);
+                }
+            });
+        }
+
+        // Fetch data initially when the page loads
+        $(document).ready(function() {
+            updateDatabasesList();
+        });
+
+        // Set an interval to update databases list every 5 seconds (5000 milliseconds)
+        setInterval(updateDatabasesList, 5000);
+    </script>
+</head>
+<body>
+
+        <form action="{{ url_for('handle_query') }}" method="POST">
+            <h1>Database Operations</h1>
+
+            <label for="query">Enter your SQL query:</label><br>
+            <textarea id="query" name="query" rows="4" cols="50"></textarea><br>
+
+            <h1>Select Database</h1>
+            <label for="database">Enter your database name:</label><br>
+            <input type="text" id="database" name="database"><br> <!-- Change to input type text -->
+
+            <input type="submit" value="Submit">
+        </form>
+    
+    <h2>Current Databases:</h2>
+    <div style="display: flex;">
+
+        <ul id="databases-list">  <!-- Updated to use id for easier selection -->
+            {% for db in databases %}
+            <li>{{ db }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+
+    {% with messages = get_flashed_messages() %}
+    {% if messages %}
+    <ul class="flashes">
+        {% for message in messages %}
+        <li>{{ message }}</li>
+        {% endfor %}
+    </ul>
+    {% endif %}
+    {% endwith %}
+
+    <!-- Display the table -->
+    {% if headers and rows %}
+        
+        <!-- <h2>Query Result:</h2> -->
+        <table border="1" style="display: block; max-width: fit-content; margin: auto;">
+                
+            <tr>
+                {% for header in headers %}
+                <th>{{ header }}</th>
+                {% endfor %}
+            </tr>
+            {% for row in rows %}
+            <tr>
+                {% for item in row %}
+                <td>{{ item }}</td>
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    {% endif %} 
+
+    <div>
+    {% if response %}
+        <center><h1>{{ response }}</h1></center>
+    {% endif %}
+    </div>
+</body>
+</html>
