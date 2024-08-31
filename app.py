@@ -1,8 +1,8 @@
 import os
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
-from operation import Operation
-from ddl_operation import DdlOperation
-from dml_operation import DmlOperation
+from pages.operation import Operation
+from pages.ddl_operation import DdlOperation
+from pages.dml_operation import DmlOperation
 
 app = Flask(__name__)
 app.secret_key = 'supersecretkey'
@@ -53,7 +53,7 @@ def handle_query():
 
 @app.route('/get_databases', methods=['GET'])
 def get_databases():
-    folders_to_skip = {'venv', '__pycache__', 'static', 'templates', 'database'}
+    folders_to_skip = {'venv', '__pycache__', 'static', 'templates', 'database','.git','pages'}
     available_databases = [d for d in os.listdir('.') if os.path.isdir(d) and d not in folders_to_skip]
     return jsonify(available_databases)
 
